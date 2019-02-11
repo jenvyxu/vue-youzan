@@ -4,7 +4,10 @@ let url={
   //http://mock.eolinker.com/A3s4BIEb3cd1095d5d9fd45a81ad657f2dbbf70bd145b4f?uri=/index/hotLists
   banner:'/index/banner',
   //http://mock.eolinker.com/A3s4BIEb3cd1095d5d9fd45a81ad657f2dbbf70bd145b4f?uri=/index/banner
-  topLists:'/category/topLists'
+  topLists:'/category/topLists',
+  subLists:'/category/subLists',
+  rank:'/category/rank',
+
 }
 //开发环境和线上环境的切换
 //let host=
