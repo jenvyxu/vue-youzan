@@ -54,19 +54,16 @@
         <div class="class-nav">
           <div id="scroll-nav" style="height: 100%;">
             <ul class="nav" id="scroll-nav-content" style="height: 540px; transform: translate3d(0px, 0px, 0px);">
-              <li class="category-name js-category-name"
-              :class="{active:index==topIndex}" 
-               data-cid="list.id" 
-               v-for="(list,index) in topLists" 
-               @click="getSubList(index,list.id)"
-               >{{list.name}}</li>
-              
+              <li class="category-name js-category-name" :class="{active:index==topIndex}" data-cid="list.id" v-for="(list,index) in topLists"
+                @click="getSubList(index,list.id)">{{list.name}}</li>
+
             </ul>
           </div>
         </div>
         <div class="class-category">
           <div id="scroll-main-wrap" class="main-content">
-            <div id="scroll-main-content" class="js-main-content inner-content" style="height: 943px; transform: translate3d(0px, 0px, 0px);" v-if="topIndex==0">
+            <div id="scroll-main-content" class="js-main-content inner-content" style="height: 943px; transform: translate3d(0px, 0px, 0px);"
+              v-if="topIndex==0">
               <div class="hot-wrap">
                 <div class="hot-goods">
                   <div class="hot-title">
@@ -182,17 +179,14 @@
                 </div>
               </div>
             </div>
-            <div id="scroll-main-content" class="js-main-content inner-content" style="height: 534px; transform: translate3d(0px, 0px, 0px);" v-if="topIndex>0">
+            <div id="scroll-main-content" class="js-main-content inner-content" style="height: 534px; transform: translate3d(0px, 0px, 0px);"
+              v-if="topIndex>0">
               <h3 class="category-title">热门品牌 </h3>
               <ul class="category-content">
 
 
-                <li class="category-item js-category-item" data-item-id="list.id" 
-                data-item-name="良品铺子"
-                v-for="list in subData.brandList"
-                >
-                  <img :src="list.image"
-                    alt="{{list.name}}" class="category-img">
+                <li class="category-item js-category-item" data-item-id="list.id" data-item-name="良品铺子" v-for="list in subData.brandList">
+                  <img :src="list.image" alt="{{list.name}}" class="category-img">
                   <span class="category-item-name">
                     {{list.name}}</span>
                 </li>
@@ -201,12 +195,8 @@
               <h3 class="category-title"> 热门分类 </h3>
               <ul class="category-content">
 
-                <li class="category-item js-category-item" data-item-id="list.id" 
-                data-item-name="水果"
-                v-for="list in subData.categoryList"
-                >
-                  <img :src="list.image"
-                    alt="{{list.image}}" class="category-img">
+                <li class="category-item js-category-item" data-item-id="list.id" data-item-name="水果" v-for="list in subData.categoryList">
+                  <img :src="list.image" alt="{{list.image}}" class="category-img">
                   <span class="category-item-name">
                     {{list.name}}</span>
                 </li>
