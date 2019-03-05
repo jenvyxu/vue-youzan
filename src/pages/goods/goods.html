@@ -24,7 +24,8 @@
     <div class="container wap-goods internal-purchase" style="min-height: 617px;">
       <div class="content no-sidebar">
         <div class="content-body">
-          <div class="custom-image-swiper custom-goods-swiper js-swp swp">
+            <swipe :lists="bannerLists"  v-if="bannerLists" style="height:375px;"></swipe>
+          <!-- <div class="custom-image-swiper custom-goods-swiper js-swp swp">
             <div class="swiper-wrapper js-swp-wrap" style="height: 375px;" data-height="320">
               <div class="swp-page"
                 style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; display: block; transform: translate3d(-9999px, 0px, 0px);">
@@ -65,7 +66,7 @@
                 <li class="swiper-pagination-switch"></li>
               </ul>
             </div>
-          </div>
+          </div> -->
           <!-- <script id="resize-img-script-used"></script> -->
           <div class="goods-header">
             <h2 class="title">{{details.title}}</h2>
