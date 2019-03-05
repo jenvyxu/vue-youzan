@@ -5,7 +5,9 @@ let url={
   topLists:'/category/topLists',
   subLists:'/category/subLists',
   rank:'/category/rank',
-  searchList:'/search/list'
+  searchList:'/search/list',
+  details:'/goods/details',
+  deal:'/goods/deal'
 
 }
 //开发环境和线上环境的切换
