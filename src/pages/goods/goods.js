@@ -25,6 +25,7 @@ new Vue({
     tabIndex:0,
     dealLists:null,
     bannerLists:null,
+    skyType:1
   },
   created(){
     this.getDetails()
@@ -33,7 +34,7 @@ new Vue({
     getDetails(){
       axios.post(url.details,{id}).then(res=>{
         this.details=res.data.data
-        this.bannerLists=[]
+        this.bannerLists=[] //传过来的数据不一致，需要作出修改
         this.details.imgs.forEach(item=> {
           this.bannerLists.push({
             clickUrl:'',

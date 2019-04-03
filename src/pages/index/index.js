@@ -25,7 +25,7 @@ let app = new Vue({
   },
   methods: {
     getLists() {
-      if(this.allLoaded)return//判断是否在加载中
+      if(this.allLoaded)return//判断所有数据是否在加载完毕，如果是则退出请求
       this.loading=true //当你请求来时，不允许再次请求
       axios.get(url.hotLists, {
         pageNum: this.pageNum,
@@ -58,3 +58,5 @@ let app = new Vue({
 
 
 })
+
+
