@@ -16,7 +16,7 @@ new Vue({
   },
   methods: {
     getTopList() {
-      axios.post(url.topLists).then(res => {
+      axios.get(url.topLists).then(res => {
         this.topLists = res.data.lists
       })
     },
@@ -26,14 +26,13 @@ new Vue({
         this.getRank()
       } else {
         axios.post(url.subLists, { id }).then(res => {
-          this.subData = res.data.data
+          this.subData = res.data
         })
       }
-
     },
     getRank(){
       axios.post(url.rank).then(res => {
-        this.rankData = res.data.data
+        this.rankData = res.data
       })
     },
     toSearch(list){
@@ -55,4 +54,5 @@ new Vue({
     }
   }
 })
+
 
