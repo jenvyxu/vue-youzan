@@ -12,9 +12,11 @@ new Vue({
     el: '.container',
     data: {
         lists: null,
-        total:0,
-        editingShop:null,
-        editingShopIndex:-1
+        total: 0,
+        editingShop: null,
+        editingShopIndex: -1,
+        removePopup:false,
+        removeData:null
     },
     computed: {
         allSelected: {
@@ -37,25 +39,41 @@ new Vue({
 
             }
         },
-        selectLists(){
-            if(this.lists&&this.lists.length){
-                let arr=[]
-                let total=0
-                this.lists.forEach(shop=>{
-                    shop.goodsList.forEach(good=>{
-                        if(good.checked){
+        allRemoveSelected: {
+            get() { 
+                if(this.editingShop){
+                    return this.editingShop.removeChecked
+                }
+                return false
+            },
+            set(newVal) {
+                if(this.editingShop){
+                    this.editingShop.removeChecked=newVal
+                    this.editingShop.goodsList.forEach(good=>{
+                        good.removeChecked=newVal
+                    })
+                }
+             }
+
+        },
+        selectLists() {
+            if (this.lists && this.lists.length) {
+                let arr = []
+                let total = 0
+                this.lists.forEach(shop => {
+                    shop.goodsList.forEach(good => {
+                        if (good.checked) {
                             arr.push(good)
-                            total+=good.price*good.number
+                            total += good.price * good.number
                         }
                     })
                 })
-                this.total=total
+                this.total = total
                 return arr
             }
             return []
         },
-        removeLists(){
-
+        removeLists() {
 
         }
     },
@@ -68,43 +86,88 @@ new Vue({
                 let lists = res.data.cartList
                 lists.forEach(shop => {
                     shop.checked = true
-                    shop.removeChecked=false
-                    shop.editing=false
-                    shop.editingMsg='编辑'
+                    shop.removeChecked = false
+                    shop.editing = false
+                    shop.editingMsg = '编辑'
                     shop.goodsList.forEach(good => {
                         good.checked = true
-                        good.removeChecked=false
+                        good.removeChecked = false
                     })
                 })
                 this.lists = lists //处理完lists再渲染页面，否则不能实现响应式
             })
         },
         selectGood(shop, good) {
-            good.checked = !good.checked
-            shop.checked = shop.goodsList.every(good => {
-                return good.checked
+            let attr = this.editingShop ? 'removeChecked' : 'checked'
+            good[attr] = !good[attr]
+            shop[attr] = shop.goodsList.every(good => {
+                return good[attr]
             })
         },
         selectShop(shop) {
-            shop.checked = !shop.checked
+            let attr = this.editingShop ? 'removeChecked' : 'checked'
+            shop[attr] = !shop[attr]
             shop.goodsList.forEach(good => {
-                good.checked = shop.checked
+                good[attr] = shop[attr]
             })
         },
         selectAll() {
-            this.allSelected = !this.allSelected
+            let attr=this.editingShop?'allRemoveSelected':'allSelected'
+            this[attr] = !this[attr]
         },
-        edit(shop,shopIndex){
-            shop.editing=!shop.editing
-            shop.editingMsg=shop.editing?'完成':'编辑'
-            this.lists.forEach((item,i)=>{
-                if(shopIndex!==i){
-                    item.editing=false
-                    item.editingMsg=shop.editing?'':'编辑'
+        edit(shop, shopIndex) {
+            shop.editing = !shop.editing
+            shop.editingMsg = shop.editing ? '完成' : '编辑'
+            this.lists.forEach((item, i) => {
+                if (shopIndex !== i) {
+                    item.editing = false
+                    item.editingMsg = shop.editing ? '' : '编辑'
                 }
             })
-            this.editingShop=shop.editing?shop:null
-            this.editingShopIndex=shop.editing?shopIndex:-1
+            this.editingShop = shop.editing ? shop : null
+            this.editingShopIndex = shop.editing ? shopIndex : -1
+        },
+        reduce(good){
+            if(good.number===1)return
+            axios.post(url.cartReduce,{
+                if:good.id,
+                number:1
+            }).then(
+                good.number--
+            )
+        },
+        add(good){ //现更改数据库的数据，成功后再更改本地数据
+            axios.post(url.cartAdd,{
+                id:good.id,
+                number:1}).then(res=>{
+                    good.number++
+                })
+        },
+        remove(shop,shopIndex,good,goodIndex){
+            this.removePopup=true
+            this.removeData={shop,shopIndex,good,goodIndex}
+        },
+        removeConfirm(){
+            let {shop,shopIndex,good,goodIndex}=this.removeData
+            axios.post(url.cartRemove,{
+                id:good.id
+            }).then(res=>{
+                shop.goodsList.splice(goodIndex,1)
+                if(!shop.goodsList.length){
+                    this.lists.splice(shopIndex,1)
+                    this.removeShop()
+                }
+                this.removePopup=false;
+            })
+            
+        },
+        removeShop(){
+            this.editingShop=null,
+            this.editingShopIndex=-1,
+            this.lists.forEach(shop=>{
+                shop.editing=false
+                shop.editingMsg='编辑'
+            })
         }
     },
     mixins: [mixin]
