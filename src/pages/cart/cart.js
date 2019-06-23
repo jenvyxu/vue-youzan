@@ -6,6 +6,8 @@ import Vue from 'vue'
 import mixin from 'js/mixin.js'
 import axios from 'axios'
 import url from 'js/api.js'
+import Velocity from 'velocity-animate'
+import Cart from 'js/cartService'
 
 
 new Vue({
@@ -16,7 +18,7 @@ new Vue({
         editingShop: null,
         editingShopIndex: -1,
         removePopup:false,
-        removeData:null
+        removeData:null,
     },
     computed: {
         allSelected: {
@@ -36,7 +38,6 @@ new Vue({
                         good.checked = newVal
                     })
                 })
-
             }
         },
         allRemoveSelected: {
@@ -99,6 +100,7 @@ new Vue({
         },
         selectGood(shop, good) {
             let attr = this.editingShop ? 'removeChecked' : 'checked'
+            console.log(attr)
             good[attr] = !good[attr]
             shop[attr] = shop.goodsList.every(good => {
                 return good[attr]
@@ -128,37 +130,79 @@ new Vue({
             this.editingShopIndex = shop.editing ? shopIndex : -1
         },
         reduce(good){
-            if(good.number===1)return
-            axios.post(url.cartReduce,{
-                if:good.id,
-                number:1
-            }).then(
+            // if(good.number===1)return
+            // axios.post(url.cartReduce,{
+            //     if:good.id,
+            //     number:1
+            // }).then(
+            //     good.number--
+            // )
+            Cart.reduce(good.id).then(res=>{
                 good.number--
-            )
+            })
+
+
+            
         },
         add(good){ //现更改数据库的数据，成功后再更改本地数据
-            axios.post(url.cartAdd,{
-                id:good.id,
-                number:1}).then(res=>{
-                    good.number++
-                })
+            // axios.post(url.cartAdd,{
+            //     id:good.id,
+            //     number:1}).then(res=>{
+            //         good.number++
+            //     })
+            Cart.add(good.id).then(res=>{
+                good.number++
+            })
         },
         remove(shop,shopIndex,good,goodIndex){
             this.removePopup=true
             this.removeData={shop,shopIndex,good,goodIndex}
+            this.removeMsg='确定要删除该商品吗？'
+        },
+        removeList(){
+            this.removePopup=true
+            this.removeMsg=`确定将所选${this.removeList.lengths}个商品删除？`
         },
         removeConfirm(){
-            let {shop,shopIndex,good,goodIndex}=this.removeData
-            axios.post(url.cartRemove,{
-                id:good.id
-            }).then(res=>{
-                shop.goodsList.splice(goodIndex,1)
-                if(!shop.goodsList.length){
-                    this.lists.splice(shopIndex,1)
-                    this.removeShop()
-                }
-                this.removePopup=false;
-            })
+            if(this.removeMsg==='确定要删除该商品吗？'){
+                let {shop,shopIndex,good,goodIndex}=this.removeData
+                axios.post(url.cartRemove,{
+                    id:good.id
+                }).then(res=>{
+                    shop.goodsList.splice(goodIndex,1)
+                    if(!shop.goodsList.length){
+                        this.lists.splice(shopIndex,1)
+                        this.removeShop()
+                    }
+                    this.removePopup=false;
+                })
+            }else{
+                let ids=[]
+                this.removeLists.forEach(good=>{
+                    ids.push(good.id)
+                })
+                axios.post(url.cartMremove,{
+                    ids
+                }).then(res=>{
+                    let arr=[]
+                    this.editingShop.goodsList.forEach(good=>{
+                        let index=this.removeLists.findIndex(item=>{
+                            return item.id==good.id
+                        })
+                        if(index===-1){
+                            arr.push(good)
+                        }
+                    })
+                    if(arr.length){
+                        this.editingShop.goodsList=arr
+                    }else{
+                        this.lists.splice(this.editingShopIndex,1)
+                        this.removeShop()
+                    }
+                    this.removePopup=false
+                })
+            }
+
             
         },
         removeShop(){
@@ -168,6 +212,24 @@ new Vue({
                 shop.editing=false
                 shop.editingMsg='编辑'
             })
+        },
+        start(e,good){
+            good.startX=e.changedTouches[0].clientX
+        },
+        end(e,shopIndex,good,goodIndex){
+            let endX=e.changedTouches[0].clientX
+            let left='0'
+            if(good.startX-endX>100){ //向左滑
+                left='-60px'
+            }
+            if(endX-good.startX>100){ //向左滑
+                left='0px'
+            }
+            console.log(`goods-${shopIndex}-${goodIndex}`)
+            Velocity(this.$refs[`goods-${shopIndex}-${goodIndex}`],{    
+                left
+            },100)
+            
         }
     },
     mixins: [mixin]
